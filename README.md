@@ -54,6 +54,16 @@ The review:
 
 The skill sets `disable-model-invocation: true`, so it only runs when you call it explicitly.
 
+## Versioning
+
+Releases use [semantic versioning](https://semver.org) and are tagged in git (`v1.0.0`, ...). The version is recorded in each skill's `SKILL.md` frontmatter (`metadata.version`), so it travels with the skill to any agent.
+
+Installs track the latest commit on `main` by default. To pin a release, check out a tag:
+
+```bash
+git clone --branch v1.0.0 https://github.com/RoKalla/skills.git
+```
+
 ## License
 
 [MIT](LICENSE)
