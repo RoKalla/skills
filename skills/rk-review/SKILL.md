@@ -1,11 +1,11 @@
 ---
 name: rk-review
-description: Senior-engineer review of the current branch against its target branch (auto-detected from the PR or branch history; override with an argument). Usage: /rk-review [target-branch]
+description: "Senior-engineer review of the current branch against its target branch (auto-detected from the PR or branch history; override with an argument). Usage: /rk-review [target-branch]"
 disable-model-invocation: true
 argument-hint: "[target-branch]"
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 Review this PR as a senior engineer who is already familiar with the repository.
