@@ -1,6 +1,7 @@
 {
   "name": "rk-skills",
   "owner": { "name": "RoKalla" },
+  "metadata": { "description": "Reusable agent skills by RoKalla, including rk-review." },
   "plugins": [
     {
       "name": "rk-skills",
