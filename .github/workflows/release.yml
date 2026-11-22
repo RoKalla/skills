@@ -1,6 +1,6 @@
 name: Release
 
-# Push an annotated tag (git tag -a vX.Y.Z -F notes.md) to release.
+# Push an annotated tag (git tag -a vX.Y.Z --cleanup=verbatim -F notes.md) to release.
 # The release is created only if every check passes; its notes are the tag message.
 
 on:
@@ -23,7 +23,7 @@ jobs:
       - name: Tag is annotated and versioned
         run: |
           [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::Tag must look like v1.2.0"; exit 1; }
-          [ "$(git cat-file -t "$GITHUB_REF_NAME")" = tag ] || { echo "::error::Use an annotated tag: git tag -a $GITHUB_REF_NAME -F notes.md"; exit 1; }
+          [ "$(git cat-file -t "$GITHUB_REF_NAME")" = tag ] || { echo "::error::Use an annotated tag: git tag -a $GITHUB_REF_NAME --cleanup=verbatim -F notes.md"; exit 1; }
       - name: Tag is on main
         run: git merge-base --is-ancestor "$GITHUB_SHA" origin/main || { echo "::error::Tagged commit is not on main"; exit 1; }
       - name: Generated files are up to date and versions match the tag

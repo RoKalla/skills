@@ -97,7 +97,7 @@ To release:
 
 1. `make version V=X.Y.Z`, then `make check`.
 2. Write the release notes to a file (`notes.md`, outside the repo or uncommitted).
-3. Commit, then create an annotated tag whose message is the notes: `git tag -a vX.Y.Z -F notes.md`.
+3. Commit, then create an annotated tag whose message is the notes: `git tag -a vX.Y.Z --cleanup=verbatim -F notes.md`. Without `--cleanup=verbatim`, git strips every line starting with `#` as a comment, so Markdown headings vanish from the notes.
 4. Push the commit and the tag: `git push origin main vX.Y.Z`.
 
 The Release workflow then checks that the tag is annotated, named `vX.Y.Z`, on `main`, that the generated files are up to date, and that every version equals `X.Y.Z`. Only if all pass does it create the GitHub release, using the tag message as the notes. Don't run `gh release create` yourself; that would skip the checks.
