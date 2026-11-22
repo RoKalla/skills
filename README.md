@@ -108,6 +108,10 @@ Installs track the latest commit on `main` by default. To pin a release, check o
 git clone --branch v1.1.0 https://github.com/RoKalla/skills.git
 ```
 
+## Acknowledgements
+
+Inspired by [Matt Pocock's skills](https://github.com/mattpocock/skills).
+
 ## License
 
 [MIT](LICENSE)
