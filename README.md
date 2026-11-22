@@ -61,7 +61,7 @@ Releases use [semantic versioning](https://semver.org) and are tagged in git (`v
 Installs track the latest commit on `main` by default. To pin a release, check out a tag:
 
 ```bash
-git clone --branch v1.0.1 https://github.com/RoKalla/skills.git
+git clone --branch v1.0.2 https://github.com/RoKalla/skills.git
 ```
 
 ## License

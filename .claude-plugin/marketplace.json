@@ -6,7 +6,7 @@
     {
       "name": "rk-skills",
       "description": "Reusable agent skills by RoKalla, including rk-review.",
-      "version": "1.0.0",
+      "version": "1.0.2",
       "source": "./",
       "strict": false,
       "skills": ["./skills/rk-review"]

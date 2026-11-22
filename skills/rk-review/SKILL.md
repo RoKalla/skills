@@ -5,7 +5,7 @@ disable-model-invocation: true
 argument-hint: "[target-branch]"
 license: MIT
 metadata:
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 Review this PR as a senior engineer who is already familiar with the repository.
@@ -25,12 +25,12 @@ If `$ARGUMENTS` is non-empty, use it as the target branch.
 Otherwise, determine the target yourself:
 
 1. If a PR/MR exists for the current branch, use its base (target) branch.
-2. If there is no PR, infer the branch this one was cut from: compare merge-bases against likely candidates (e.g. `dev`, `develop`, `main`, `master`, release branches) and pick the one with the closest merge-base / fewest commits ahead.
+2. If there is no PR, infer the branch this one was cut from. For each likely candidate that exists on the remote (e.g. `dev`, `develop`, `main`, `master`, release branches), run `git rev-list --count origin/<candidate>..HEAD` and pick the candidate with the smallest count (the fewest commits on this branch that aren't on the candidate).
 3. If still ambiguous, ask the user instead of guessing.
 
 State which target branch you chose and how you determined it.
 
-Review the diff between this branch and its merge-base with the target (`git diff <target>...HEAD`). Fetch the target first if needed.
+Run `git fetch origin <target>` first, then review the diff between this branch and its merge-base with the up-to-date remote target: `git diff origin/<target>...HEAD`. Don't diff against the local `<target>` branch, since it may be stale. If the remote isn't named `origin`, use the actual remote name.
 
 ## Focus areas
 
