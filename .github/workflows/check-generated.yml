@@ -9,6 +9,6 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Shared sections and rk-full-review are up to date
         run: make check
