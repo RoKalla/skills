@@ -91,7 +91,7 @@ Versions follow [semver](https://semver.org) and apply to the whole repo: a rele
 - **Minor** (`1.2.0`): new skills or new behaviour.
 - **Major** (`2.0.0`): changes that break how existing skills are invoked.
 
-The version lives in every `skills/*/SKILL.md` (`metadata.version`), `templates/rk-full-review.md`, `.claude-plugin/marketplace.json`, and the pin example in `README.md`. `make version` sets them all; `make check` fails if they differ.
+The version lives in every `skills/*/SKILL.md` (`metadata.version`), `templates/rk-full-review.md`, `.claude-plugin/marketplace.json`, and the pin example in `README.md`. `make version` sets them all; `make check` fails if they differ. These places are listed in `VERSIONED` in `scripts/build.py`; if you add a new one (e.g. a version badge), add it there too, or the check won't see it.
 
 To release:
 
