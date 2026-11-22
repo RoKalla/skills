@@ -44,12 +44,14 @@ If `$ARGUMENTS` is non-empty, use it as the target branch.
 Otherwise, determine the target yourself:
 
 1. If a PR/MR exists for the current branch, use its base (target) branch.
-2. If there is no PR, infer the branch this one was cut from. For each likely candidate that exists on the remote (e.g. `dev`, `develop`, `main`, `master`, release branches), run `git rev-list --count origin/<candidate>..HEAD` and pick the candidate with the smallest count (the fewest commits on this branch that aren't on the candidate).
+2. If there is no PR, infer the branch this one was cut from. For each likely candidate that exists on the remote (e.g. `dev`, `develop`, `main`, `master`, release branches), run `git rev-list --count <remote>/<candidate>..HEAD` and pick the candidate with the smallest count (the fewest commits on this branch that aren't on the candidate).
 3. If still ambiguous, ask the user instead of guessing.
 
 State which target branch you chose and how you determined it.
 
-Run `git fetch origin <target>` first, then review the diff between this branch and its merge-base with the up-to-date remote target: `git diff origin/<target>...HEAD`. Don't diff against the local `<target>` branch, since it may be stale. If the remote isn't named `origin`, use the actual remote name.
+Run `git fetch <remote> <target>` first, then review the diff between this branch and its merge-base with the up-to-date remote target: `git diff <remote>/<target>...HEAD`. Don't diff against the local `<target>` branch, since it may be stale.
+
+`<remote>` is the remote that hosts the PR, or will host it (see *Where the PR lives*). In a fork that's usually `upstream`, not `origin`.
 
 ## Focus areas
 
