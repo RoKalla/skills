@@ -11,4 +11,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Shared sections and rk-full-review are up to date
-        run: python3 scripts/build.py --check
+        run: make check

@@ -96,18 +96,7 @@ All skills set `disable-model-invocation: true`, so they only run when you call 
 
 ## Development
 
-`rk-full-review` and the shared "Where the PR lives" section are generated, so the copies can't drift:
-
-- `shared/platform.md` is copied into each skill between `<!-- BEGIN SHARED: platform -->` / `<!-- END SHARED: platform -->` markers
-- `skills/rk-full-review/SKILL.md` is built from `templates/rk-full-review.md`, `rk-review` and `rk-post-findings`
-
-Edit the sources, then run:
-
-```bash
-python3 scripts/build.py
-```
-
-CI runs `python3 scripts/build.py --check` and fails if a generated file is out of date.
+`rk-full-review` and the shared "Where the PR lives" section are generated. After editing their sources, run `make build`; CI runs `make check` and fails if a generated file is out of date. See [CONTRIBUTING.md](CONTRIBUTING.md) for which files are generated, how to add a skill, and how to cut a release.
 
 ## Versioning
 
