@@ -4,7 +4,7 @@ description: "Post the rk-review findings from this conversation to the PR in on
 disable-model-invocation: true
 license: MIT
 metadata:
-  version: "1.1.1"
+  version: "1.2.0"
 ---
 
 Post the findings of the code review in this conversation to its PR, as **one batch**: a single review on GitHub, a single comment everywhere else. One batch means one notification and a PR that isn't spammed.
@@ -46,7 +46,7 @@ Earlier runs left posts containing the marker `<!-- rk-review -->`: reviews, rev
 
 Every post starts with the marker line `<!-- rk-review -->`. It's invisible when rendered and lets later runs find the post.
 
-Each finding renders as: `**#N · Severity**`, the location linked to that line at the reviewed commit, then Issue, Why, and Recommendation.
+Each finding renders as: `**#N · Severity**`, the location linked to that line at the reviewed commit, then Issue, Why, and Recommendation. A question renders the same way as `**#N · Question**`, with Question and Why. Questions are posted like findings: as line comments where their lines are in the diff, otherwise in the review body or comment.
 
 ### GitHub: one review with line comments
 

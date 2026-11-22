@@ -1,0 +1,20 @@
+name: Check generated skills
+
+# Fails if a generated file is out of date or the versions differ.
+# On pull requests this is the required status check that guards main;
+# it never writes, so main stays protected.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - name: Generated files are up to date and versions match
+        run: make check
