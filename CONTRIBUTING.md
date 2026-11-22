@@ -10,7 +10,7 @@ shared/platform.md            "Where the PR lives" section, copied into several 
 templates/rk-full-review.md   template for the generated rk-full-review skill
 scripts/build.py              the generator
 .claude-plugin/marketplace.json   Claude Code plugin manifest
-.github/workflows/sync.yml     CI: regenerates on main, checks on PRs
+.github/workflows/check.yml    CI: checks generated files and versions (required on PRs)
 .github/workflows/release.yml  CI: checks and publishes releases from tags
 ```
 
@@ -34,10 +34,11 @@ Run `make build` after changing any of:
 
 Other edits (README, `ask-rk`, the non-generated parts of `rk-address-review`, …) need no build. Running it anyway is harmless.
 
-If you forget, CI catches it:
+If you forget, CI catches it: the Check workflow runs `make check` on every pull request, and the PR can't merge until the branch is rebuilt.
 
-- **Push to `main`**: the Sync workflow runs `make build` and commits any changes as `github-actions[bot]` ("Regenerate skills"), so `main` catches up within a minute. Run `git pull` before your next push.
-- **Pull request**: the workflow only checks, and fails until the branch is rebuilt.
+## Branch protection
+
+`main` is protected by a ruleset: every change goes through a pull request, the Check workflow's `check` job must pass with the branch up to date with `main`, and force pushes and deleting `main` are blocked. Nothing pushes to `main` directly, not even CI.
 
 | Command | What it does |
 | --- | --- |
@@ -95,10 +96,12 @@ The version lives in every `skills/*/SKILL.md` (`metadata.version`), `templates/
 
 To release:
 
-1. `make version V=X.Y.Z`, then `make check`.
-2. Write the release notes to a file (`notes.md`, outside the repo or uncommitted).
-3. Commit, then create an annotated tag whose message is the notes: `git tag -a vX.Y.Z --cleanup=verbatim -F notes.md`. Without `--cleanup=verbatim`, git strips every line starting with `#` as a comment, so Markdown headings vanish from the notes.
-4. Push the commit and the tag: `git push origin main vX.Y.Z`.
+1. On a branch: `make version V=X.Y.Z`, then `make check`. Commit, push, and open a pull request.
+2. Merge the pull request once the `check` job passes.
+3. Update your local `main`: `git switch main && git pull`. Tag this commit, not the branch's: a squash or rebase merge gives `main` a different commit.
+4. Write the release notes to a file (`notes.md`, outside the repo or uncommitted).
+5. Create an annotated tag whose message is the notes: `git tag -a vX.Y.Z --cleanup=verbatim -F notes.md`. Without `--cleanup=verbatim`, git strips every line starting with `#` as a comment, so Markdown headings vanish from the notes.
+6. Push only the tag: `git push origin vX.Y.Z`.
 
 The Release workflow then checks that the tag is annotated, named `vX.Y.Z`, on `main`, that the generated files are up to date, and that every version equals `X.Y.Z`. Only if all pass does it create the GitHub release, using the tag message as the notes. Don't run `gh release create` yourself; that would skip the checks.
 
