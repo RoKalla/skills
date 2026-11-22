@@ -5,7 +5,7 @@ disable-model-invocation: true
 argument-hint: "[target-branch]"
 license: MIT
 metadata:
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 Review this PR as a senior engineer who is already familiar with the repository.

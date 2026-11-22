@@ -10,7 +10,8 @@ shared/platform.md            "Where the PR lives" section, copied into several 
 templates/rk-full-review.md   template for the generated rk-full-review skill
 scripts/build.py              the generator
 .claude-plugin/marketplace.json   Claude Code plugin manifest
-.github/workflows/            CI: fails if generated files are out of date
+.github/workflows/sync.yml     CI: regenerates on main, checks on PRs
+.github/workflows/release.yml  CI: checks and publishes releases from tags
 ```
 
 Skill folders must stay self-contained: `npx skills add` and manual installs copy each folder on its own, so a skill can't reference files outside its folder. Shared text is copied into each skill by the generator instead.
@@ -33,10 +34,16 @@ Run `make build` after changing any of:
 
 Other edits (README, `ask-rk`, the non-generated parts of `rk-address-review`, …) need no build. Running it anyway is harmless.
 
+If you forget, CI catches it:
+
+- **Push to `main`**: the Sync workflow runs `make build` and commits any changes as `github-actions[bot]` ("Regenerate skills"), so `main` catches up within a minute. Run `git pull` before your next push.
+- **Pull request**: the workflow only checks, and fails until the branch is rebuilt.
+
 | Command | What it does |
 | --- | --- |
 | `make build` | Regenerates the files above. |
-| `make check` | Writes nothing; exits non-zero if a generated file is out of date. CI runs this on every push and PR. |
+| `make check` | Writes nothing; fails if a generated file is out of date or the versions differ. |
+| `make version V=X.Y.Z` | Sets the version everywhere, then builds. |
 | `make help` | Lists the targets. |
 
 ### How the generator builds `rk-full-review`
@@ -84,11 +91,20 @@ Versions follow [semver](https://semver.org) and apply to the whole repo: a rele
 - **Minor** (`1.2.0`): new skills or new behaviour.
 - **Major** (`2.0.0`): changes that break how existing skills are invoked.
 
+The version lives in every `skills/*/SKILL.md` (`metadata.version`), `templates/rk-full-review.md`, `.claude-plugin/marketplace.json`, and the pin example in `README.md`. `make version` sets them all; `make check` fails if they differ.
+
 To release:
 
-1. Set the new version in every `skills/*/SKILL.md` (`metadata.version`), in `templates/rk-full-review.md`, and in `.claude-plugin/marketplace.json`.
-2. Update the pin example in `README.md` (`git clone --branch vX.Y.Z …`).
-3. Run `make build` and `make check`.
-4. Commit, then create an annotated tag whose message is the release notes: `git tag -a vX.Y.Z -F notes.md`.
-5. Push the commit and the tag: `git push origin main vX.Y.Z`.
-6. Create the GitHub release from the same notes: `gh release create vX.Y.Z --title vX.Y.Z --notes-file notes.md --verify-tag`.
+1. `make version V=X.Y.Z`, then `make check`.
+2. Write the release notes to a file (`notes.md`, outside the repo or uncommitted).
+3. Commit, then create an annotated tag whose message is the notes: `git tag -a vX.Y.Z -F notes.md`.
+4. Push the commit and the tag: `git push origin main vX.Y.Z`.
+
+The Release workflow then checks that the tag is annotated, named `vX.Y.Z`, on `main`, that the generated files are up to date, and that every version equals `X.Y.Z`. Only if all pass does it create the GitHub release, using the tag message as the notes. Don't run `gh release create` yourself; that would skip the checks.
+
+If the workflow fails, no release exists. Delete the tag, fix the problem, and tag again:
+
+```bash
+git push --delete origin vX.Y.Z
+git tag -d vX.Y.Z
+```

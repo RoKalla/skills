@@ -96,7 +96,7 @@ All skills set `disable-model-invocation: true`, so they only run when you call 
 
 ## Development
 
-`rk-full-review` and the shared "Where the PR lives" section are generated. After editing their sources, run `make build`; CI runs `make check` and fails if a generated file is out of date. See [CONTRIBUTING.md](CONTRIBUTING.md) for which files are generated, how to add a skill, and how to cut a release.
+`rk-full-review` and the shared "Where the PR lives" section are generated. After editing their sources, run `make build`; on `main`, CI regenerates them automatically if you forget. Releases are published by CI from annotated tags, after checking that everything is in sync and every version matches the tag. See [CONTRIBUTING.md](CONTRIBUTING.md) for which files are generated, how to add a skill, and how to cut a release.
 
 ## Versioning
 
@@ -105,7 +105,7 @@ Releases use [semantic versioning](https://semver.org) and are tagged in git (`v
 Installs track the latest commit on `main` by default. To pin a release, check out a tag:
 
 ```bash
-git clone --branch v1.1.0 https://github.com/RoKalla/skills.git
+git clone --branch v1.1.1 https://github.com/RoKalla/skills.git
 ```
 
 ## Acknowledgements

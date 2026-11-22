@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
-"""Keep the skills in sync with their shared sources.
+"""Keep the skills in sync with their shared sources, and keep versions consistent.
 
 1. Fills every `<!-- BEGIN SHARED: x -->` ... `<!-- END SHARED: x -->` block in
    skills/*/SKILL.md with shared/x.md.
 2. Generates skills/rk-full-review/SKILL.md from templates/rk-full-review.md.
+3. Checks that every version (skills, template, marketplace.json, README pin) is the same.
 
 Usage:
-  python3 scripts/build.py          # write the files
-  python3 scripts/build.py --check  # exit 1 if any file is out of date (CI)
+  python3 scripts/build.py                          # write the files
+  python3 scripts/build.py --check                  # exit 1 if out of date or versions differ (CI)
+  python3 scripts/build.py --check --expect 1.2.0   # also require that version (release CI)
+  python3 scripts/build.py --set-version 1.2.0      # set the version everywhere, then build
 """
 import re
 import sys
@@ -24,6 +27,15 @@ NOTICE = (
 BLOCK = re.compile(r"(<!-- BEGIN SHARED: (\S+) -->\n)(.*?)(<!-- END SHARED: \2 -->)", re.S)
 FRONTMATTER = re.compile(r"\A---\n.*?\n---\n", re.S)
 INCLUDE = re.compile(r"\{\{(shared|body):(\S+?)\}\}")
+
+SEMVER = re.compile(r"\d+\.\d+\.\d+")
+# file glob -> pattern whose group 2 is the version
+VERSIONED = {
+    "skills/*/SKILL.md": re.compile(r'^(  version: ")([^"]*)(")', re.M),
+    "templates/rk-full-review.md": re.compile(r'^(  version: ")([^"]*)(")', re.M),
+    ".claude-plugin/marketplace.json": re.compile(r'("version": ")([^"]*)(")'),
+    "README.md": re.compile(r"(--branch v)(\S+)( )"),
+}
 
 
 def shared(name: str) -> str:
@@ -71,8 +83,54 @@ def build() -> dict[Path, str]:
     return out
 
 
+def versioned_files():
+    for pattern, regex in VERSIONED.items():
+        for path in sorted(ROOT.glob(pattern)):
+            if path != GENERATED:  # takes its version from the template
+                yield path, regex
+
+
+def set_version(version: str) -> None:
+    for path, regex in versioned_files():
+        text = path.read_text()
+        new, count = regex.subn(lambda m: m.group(1) + version + m.group(3), text)
+        if count == 0:
+            sys.exit(f"no version found in {path.relative_to(ROOT)}")
+        if new != text:
+            path.write_text(new)
+            print(f"version {version} in {path.relative_to(ROOT)}")
+
+
+def version_problems(expect: str | None) -> list[str]:
+    found = {p: [m.group(2) for m in r.finditer(p.read_text())] for p, r in versioned_files()}
+    problems = [f"no version found in {p.relative_to(ROOT)}" for p, v in found.items() if not v]
+    distinct = sorted({v for vs in found.values() for v in vs})
+    if expect and distinct != [expect]:
+        problems.append(f"expected version {expect} everywhere")
+    elif len(distinct) > 1:
+        problems.append("versions differ")
+    if problems:
+        for p, vs in found.items():
+            problems.append(f"  {p.relative_to(ROOT)}: {', '.join(vs) or '-'}")
+    return problems
+
+
+def arg(name: str) -> str | None:
+    args = sys.argv[1:]
+    if name not in args:
+        return None
+    i = args.index(name)
+    if i + 1 >= len(args) or not SEMVER.fullmatch(args[i + 1]):
+        sys.exit(f"{name} needs a version like 1.2.0")
+    return args[i + 1]
+
+
 def main() -> int:
     check = "--check" in sys.argv[1:]
+    expect = arg("--expect")
+    new_version = arg("--set-version")
+    if new_version:
+        set_version(new_version)
     stale = []
     for path, content in build().items():
         current = path.read_text() if path.exists() else None
@@ -82,11 +140,19 @@ def main() -> int:
         if not check:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(content)
-    if check and stale:
-        print("Out of date (run `python3 scripts/build.py`):")
-        for p in stale:
-            print(f"  {p}")
-        return 1
+    if check:
+        failed = False
+        if stale:
+            failed = True
+            print("Out of date (run `make build`):")
+            for p in stale:
+                print(f"  {p}")
+        problems = version_problems(expect)
+        if problems:
+            failed = True
+            print("Version mismatch (run `make version V=X.Y.Z`):")
+            print("\n".join(problems))
+        return 1 if failed else 0
     for p in stale:
         print(f"updated {p}")
     return 0
