@@ -52,7 +52,7 @@ Done when: you have a numbered list of open threads, each with author, location 
 
 ## 2. Understand before judging
 
-Read the PR's intent (description, commits, linked issue) and its diff against the target branch (`git fetch <remote> <target>` first, then `git diff <remote>/<target>...HEAD`, where `<remote>` is the remote that hosts the PR; in a fork that's usually `upstream`, not `origin`). For each thread, read the code it points at and enough surrounding code (callers, tests, similar implementations) to know whether the reviewer's claim holds at runtime.
+Read the PR's intent (description, commits, linked issue) and its diff. `<target>` is the PR's base branch; when there is no PR, ask the user. `<remote>` is the remote that hosts the PR; in a fork that's usually `upstream`, not `origin`. Run `git fetch <remote> <target>`, then `git diff <remote>/<target>...HEAD`. For each thread, read the code it points at and enough surrounding code (callers, tests, similar implementations) to know whether the reviewer's claim holds at runtime.
 
 Done when: every thread has a verdict you could defend with evidence from the code.
 

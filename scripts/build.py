@@ -12,6 +12,8 @@ Usage:
   python3 scripts/build.py --check --expect 1.2.0   # also require that version (release CI)
   python3 scripts/build.py --set-version 1.2.0      # set the version everywhere, then build
 """
+from __future__ import annotations
+
 import re
 import sys
 from pathlib import Path
@@ -126,7 +128,14 @@ def arg(name: str) -> str | None:
 
 
 def main() -> int:
-    check = "--check" in sys.argv[1:]
+    args = sys.argv[1:]
+    for i, a in enumerate(args):
+        if a in ("--check", "--expect", "--set-version"):
+            continue
+        if i > 0 and args[i - 1] in ("--expect", "--set-version"):
+            continue
+        sys.exit(f"unknown argument: {a}\n{__doc__}")
+    check = "--check" in args
     expect = arg("--expect")
     new_version = arg("--set-version")
     if new_version:

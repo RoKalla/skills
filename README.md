@@ -1,6 +1,6 @@
 # skills
 
-Reusable [Agent Skills](https://docs.claude.com/en/docs/claude-code/skills) for Claude Code and other agents that support the `SKILL.md` format.
+Reusable [Agent Skills](https://code.claude.com/docs/en/skills) for reviewing PRs and addressing review feedback. Built for Claude Code; other agents that read `SKILL.md` may ignore some features (`disable-model-invocation`, `argument-hint`, `$ARGUMENTS`).
 
 ## Skills
 
