@@ -1,0 +1,14 @@
+name: Check generated skills
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Shared sections and rk-full-review are up to date
+        run: python3 scripts/build.py --check

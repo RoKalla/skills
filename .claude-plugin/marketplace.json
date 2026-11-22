@@ -1,15 +1,21 @@
 {
   "name": "rk-skills",
   "owner": { "name": "RoKalla" },
-  "metadata": { "description": "Reusable agent skills by RoKalla, including rk-review." },
+  "metadata": { "description": "Reusable agent skills by RoKalla, for reviewing PRs and addressing review feedback." },
   "plugins": [
     {
       "name": "rk-skills",
-      "description": "Reusable agent skills by RoKalla, including rk-review.",
-      "version": "1.0.2",
+      "description": "Reusable agent skills by RoKalla, for reviewing PRs and addressing review feedback.",
+      "version": "1.1.0",
       "source": "./",
       "strict": false,
-      "skills": ["./skills/rk-review"]
+      "skills": [
+        "./skills/ask-rk",
+        "./skills/rk-review",
+        "./skills/rk-post-findings",
+        "./skills/rk-full-review",
+        "./skills/rk-address-review"
+      ]
     }
   ]
 }

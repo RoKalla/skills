@@ -5,7 +5,7 @@ disable-model-invocation: true
 argument-hint: "[target-branch]"
 license: MIT
 metadata:
-  version: "1.0.2"
+  version: "1.1.0"
 ---
 
 Review this PR as a senior engineer who is already familiar with the repository.
@@ -14,9 +14,28 @@ First, understand the existing codebase and its conventions before evaluating th
 
 Read the PR description, commit messages, and any linked issue to understand the intended behavior. If the intent is unclear, say so instead of guessing.
 
-Also read the PR's discussion: review comments, inline threads, and replies. Use whatever tooling fits the repo's hosting platform (check the remote URL to identify it). Note which concerns are already raised, resolved, or still open, so you don't repeat settled points and can verify that requested changes were actually made. If no PR exists or its discussion can't be accessed, say so and continue with the description and commits.
+Also read the PR's discussion: review comments, inline threads, and replies, using the tool from *Where the PR lives*. Posts containing `<!-- rk-review -->` are earlier runs of this review; check which of their findings the code now fixes. Note which concerns are already raised, resolved, or still open, so you don't repeat settled points and can verify that requested changes were actually made. If no PR exists or its discussion can't be accessed, say so and continue with the description and commits.
 
 Then review the changes in this branch.
+
+<!-- BEGIN SHARED: platform -->
+## Where the PR lives
+
+Find the hosting platform from the remote URL (`git remote -v`): check the remote the current branch tracks first, then `origin`, then `upstream`. Use that platform's tool for everything PR-related:
+
+| Remote host | Tool |
+| --- | --- |
+| `github.com`, GitHub Enterprise | `gh` (for Enterprise, set `GH_HOST=<host>`) |
+| `gitlab.com`, self-hosted GitLab | `glab` |
+| `dev.azure.com`, `*.visualstudio.com` | `az repos` (Azure CLI with the `azure-devops` extension); comment threads through `az devops invoke` |
+| `bitbucket.org` | the REST API through `curl`, with a token the user provides |
+
+If the host is an SSH alias (e.g. `git@github-work:org/repo.git`), resolve it from `~/.ssh/config`. If the host is still unrecognised, ask the user.
+
+Before the first PR call, check that the tool is installed and authenticated (`gh auth status`, `glab auth status`, `az account show`). If it isn't, give the user the install or login command and continue with what git alone provides.
+
+The PR can live on a different remote than the one you push to: a fork's PR lives on the parent repo. Find it from the current branch: `gh pr view` (resolves forks to the parent repo, or to `gh repo set-default`), `glab mr view`, `az repos pr list --source-branch <branch>`. If no PR is found, or several remotes could host it, ask the user.
+<!-- END SHARED: platform -->
 
 ## Target branch
 
@@ -153,10 +172,10 @@ Prioritize:
 
 Do not praise the code unnecessarily and do not repeat things that are already correct.
 
-For every finding, provide:
+Number the findings `#1`, `#2`, … in severity order, Critical first. For every finding, provide:
 
-**Severity:** Critical / High / Medium / Low
-**Location:** File and line/range
+**#N · Severity:** Critical / High / Medium / Low
+**Location:** `path/to/file:line` or `path/to/file:start-end`, as line numbers in the reviewed (`HEAD`) version of the file; `General` when the finding isn't tied to a line
 **Issue:** What is wrong
 **Why:** Why this matters and under what conditions it can occur
 **Recommendation:** A concrete way to fix it
