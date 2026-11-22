@@ -61,10 +61,12 @@ Both `rk-review` and `rk-full-review` take an optional target branch (`/rk-revie
 
 The review:
 
-- learns the surrounding codebase and its conventions first
-- reads the PR description, commits, linked issues and the PR's review discussion
+- learns the surrounding codebase, its conventions and its documented standards (`CONTRIBUTING.md`, `CLAUDE.md`, …) first, and skips what linters already enforce
+- reads the PR description, commits, linked issues, spec files and the PR's review discussion
+- checks the change against those requirements: missing or wrong requirements, and unrequested scope
 - diffs against the merge-base with the up-to-date remote target branch
-- reports numbered findings (`#1`, `#2`, …) with severity, location and a recommendation, then a verdict
+- hands the review itself to a sub-agent with a fresh context, so the reviewer doesn't share the assumptions of the conversation that wrote the code (falls back to reviewing inline where sub-agents aren't available)
+- reports numbered findings (`#1`, `#2`, …) with severity, location and a recommendation, plus questions where the author's intent decides, then a verdict
 
 Posting the findings:
 
@@ -85,8 +87,8 @@ Run on your PR branch after it has received review feedback:
 It:
 
 - collects every open review thread (or uses a review you paste, if nothing is posted on the PR)
-- checks each comment against the code and sorts it into fix / already done / push back / ask
-- shows you that plan and waits for your approval
+- checks each comment against the code, gives it its own severity next to the reviewer's, and sorts it into fix / already done / push back / ask / answer
+- shows you that plan as a table, with a one-line reason per thread, and asks "Continue with these changes?" before touching anything
 - applies the approved fixes as local commits (one per thread) and runs the repo's checks
 - drafts replies citing commit SHAs: one per thread, or one combined reply for findings that came in a single comment
 
@@ -105,7 +107,7 @@ Releases use [semantic versioning](https://semver.org) and are tagged in git (`v
 Installs track the latest commit on `main` by default. To pin a release, check out a tag:
 
 ```bash
-git clone --branch v1.1.1 https://github.com/RoKalla/skills.git
+git clone --branch v1.2.0 https://github.com/RoKalla/skills.git
 ```
 
 ## Acknowledgements

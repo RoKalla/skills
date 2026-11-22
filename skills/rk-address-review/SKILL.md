@@ -5,7 +5,7 @@ disable-model-invocation: true
 argument-hint: "[PR number or URL]"
 license: MIT
 metadata:
-  version: "1.1.1"
+  version: "1.2.0"
 ---
 
 You are the author of this PR, addressing its review feedback. You own the code and judge each comment on its merits: a reviewer, human or agent, can be wrong, and a reasoned pushback serves the PR better than a blind fix.
@@ -64,10 +64,22 @@ Classify each thread:
 * **Already done**: the code already handles it; point to where (file:line or commit).
 * **Push back**: the claim is wrong or the change would make things worse; give the concrete reason, citing code or repo conventions.
 * **Ask**: the request is ambiguous or needs a decision only the reviewer or user can make; write the question.
+* **Answer**: the reviewer asked a question (e.g. `#N · Question`); answer it from the code and your intent. If the answer shows a real problem, classify it as **Fix** instead.
 
-Weigh the reviewer's stated severity and confidence, but verify independently: a High finding can be wrong, a Low one can hide a real bug.
+Weigh the reviewer's stated severity and confidence, but verify independently: a High finding can be wrong, a Low one can hide a real bug. Give each thread your own severity on the same scale (Critical / High / Medium / Low), `?` when you can't tell until the question is settled (**Ask**), or `—` when there is no real problem (**Push back**, **Already done**, or an **Answer** that shows none).
 
-Show the plan as a table (thread #, location, verdict, one-line action) and **stop for the user's approval**. Apply their edits to the plan before continuing.
+Show the plan as a table, ordered by your severity: Critical first, then `?`, then `—`:
+
+| # | Location | Reviewer | Yours | Verdict | Why | Action |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | `src/auth.ts:42` | High | High | Fix | Real bug: expired tokens pass the `<` check | Use `<=`, add a test |
+| 3 | `src/api.ts:88` | High | Low | Fix | Only reachable from an internal caller | Add the null guard |
+| 2 | `src/db.ts:10` | Medium | — | Push back | The pool is closed in `finally` at `db.ts:31` | Reply with the location |
+
+* **Reviewer**: the severity the reviewer gave; `—` when they gave none.
+* **Why**: one line of evidence for your verdict. Explain every row where your severity differs from the reviewer's.
+
+End with an explicit question: **"Continue with these changes?"** Then **stop for the user's approval**. The user can approve, drop rows, or change a verdict; apply their edits to the plan before continuing.
 
 Done when: the user has approved the plan.
 
@@ -91,6 +103,7 @@ Per verdict:
 * **Already done**: where it is handled.
 * **Push back**: the reason, briefly and respectfully, with the evidence.
 * **Ask**: the question.
+* **Answer**: the answer, briefly, pointing to the code that shows it.
 
 Keep replies short and specific, in the tone of the existing PR discussion.
 

@@ -5,7 +5,7 @@ disable-model-invocation: true
 argument-hint: "[your situation]"
 license: MIT
 metadata:
-  version: "1.1.1"
+  version: "1.2.0"
 ---
 
 Recommend the rk skill, or sequence of skills, that fits the user's situation (`$ARGUMENTS`, or ask what they're trying to do). Name the command, say why it fits, and mention the alternative when two are close. If none fits, say so.
