@@ -1,6 +1,6 @@
 ---
 name: rk-address-review
-description: "Address review feedback on your own PR: triage every open comment, apply the valid fixes as local commits, and draft a reply per thread. Never posts or pushes. Usage: /rk-address-review [PR number or URL]"
+description: "Address review feedback on your own PR: triage every open comment and, once you approve the plan, commit and push the fixes, update the PR description, reply to every thread and resolve the settled ones. Usage: /rk-address-review [PR number or URL]"
 disable-model-invocation: true
 argument-hint: "[PR number or URL]"
 license: MIT
@@ -10,7 +10,7 @@ metadata:
 
 You are the author of this PR, addressing its review feedback. You own the code and judge each comment on its merits: a reviewer, human or agent, can be wrong, and a reasoned pushback serves the PR better than a blind fix.
 
-The output is a **draft**: local commits plus reply texts the user posts themselves. Everything stays on this machine. Leave posting, resolving threads, and pushing to the user.
+The user approves once, at the plan in step 4. That approval covers everything after it: the commits, the push, the PR description, the replies, and resolving threads. Don't ask again between those steps; stop only when something below says to.
 
 <!-- BEGIN SHARED: platform -->
 ## Where the PR lives
@@ -91,7 +91,7 @@ Show the plan as a table, ordered by your severity: Critical, High, Medium, Low,
 * **Reviewer**: the severity the reviewer gave; `—` when they gave none.
 * **Why**: one line of evidence for your verdict. Explain every row where your severity differs from the reviewer's.
 
-End with an explicit question: **"Continue with these changes?"** Then **stop for the user's approval**. The user can approve, drop rows, or change a verdict; apply their edits to the plan before continuing.
+Below the table, say what approval will do: commit the fixes, push them, update the PR description if it no longer matches, post a reply to every thread, and resolve the threads marked **Fix**, **Already done** or **Answer**. End with an explicit question: **"Continue with these changes?"** Then **stop for the user's approval**. The user can approve, drop rows, or change a verdict; apply their edits to the plan before continuing.
 
 Done when: the user has approved the plan.
 
@@ -99,15 +99,15 @@ Done when: the user has approved the plan.
 
 For each **Fix** thread, make the change in the style of the surrounding code, reusing existing helpers and patterns. Keep each change scoped to its thread; note anything else you spot for the summary instead of fixing it.
 
-Commit locally, one commit per thread (or per tightly related group), following the repo's commit message conventions. Record each commit's short SHA against its thread.
+Commit, one commit per thread (or per tightly related group), following the repo's commit message conventions. Record each commit's short SHA against its thread.
 
 Run the repo's tests, linter, and type checker for the affected areas (find the commands in the repo's scripts, config, or docs). Fix failures your changes caused.
 
-Done when: every Fix thread has a commit, and the checks pass, or the remaining failures are shown to predate your changes.
+Done when: every Fix thread has a commit, and the checks pass, or the remaining failures are shown to predate your changes. If failures your changes caused remain, stop here: don't push or post, and report them in the final summary.
 
-## 6. Draft the replies
+## 6. Write the replies
 
-Write one reply per thread, ready to paste. Where several findings share one comment or review body, write one combined reply to it that answers each finding by number (`#1 Fixed in abc1234.`, `#2 …`), so the PR gets one reply instead of many.
+Write one reply per thread. Where several findings share one comment or review body, write one combined reply to it that answers each finding by number (`#1 Fixed in abc1234.`, `#2 …`), so the PR gets one reply instead of many.
 
 Per verdict:
 
@@ -119,12 +119,37 @@ Per verdict:
 
 Keep replies short and specific, in the tone of the existing PR discussion.
 
+Without a PR (a pasted review), stop after this step: show the commits and the replies, and leave pushing and posting to the user.
+
+## 7. Push and update the PR
+
+Push the branch with a plain `git push`. Never force-push. If the push is rejected because the remote branch moved, stop and tell the user; don't pull, rebase, or post anything.
+
+Then read the PR description again. If the fixes made any of it wrong (code it quotes, file names, test counts, described behaviour), update those parts and keep the rest: its structure, wording, and any template it follows. If nothing in it is out of date, leave it alone.
+
+Done when: the PR's head is your last commit, and its description matches the code.
+
+## 8. Post the replies and resolve threads
+
+Post each reply where its thread lives, using the platform's tool:
+
+* **A review thread or inline comment**: a reply in that thread. On GitHub: `gh api repos/<owner>/<repo>/pulls/<n>/comments/<comment-id>/replies -f body=...`.
+* **Findings from one comment or review body**: the combined reply, as a new PR comment. A review body has no thread to reply in.
+* **A top-level conversation comment**: a new PR comment that quotes or links the comment it answers.
+
+Then resolve the threads whose verdict is **Fix**, **Already done**, or **Answer** (on GitHub, the GraphQL `resolveReviewThread` mutation with the thread's node id; on GitLab, resolve the discussion; on Azure DevOps, set the thread's status to `fixed`). Leave **Push back** and **Ask** threads open: they wait for the reviewer. Plain PR comments have no thread to resolve.
+
+If a post or resolve fails, keep going with the rest and report the failures.
+
+Done when: every thread has a posted reply, and every Fix, Already done, and Answer thread is resolved.
+
 ## Final summary
 
 Finish with:
 
-* The commits created (SHA and subject), unpushed
-* Each thread with its verdict and drafted reply, grouped by thread, with location so the user can find it on the PR
+* The commits pushed (SHA and subject), and the PR's head commit
+* What changed in the PR description, or that it needed no change
+* Each thread with its verdict, its reply, a link to the posted reply, and whether it was resolved or left open (and why)
 * Check results (tests, lint, types)
 * Anything noticed outside the review's scope
-* Next steps for the user: review the commits, push, post the replies, resolve threads
+* Anything that failed or was skipped (a rejected push, a failed post), and what the user needs to do about it
