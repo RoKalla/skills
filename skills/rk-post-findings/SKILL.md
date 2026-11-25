@@ -4,7 +4,7 @@ description: "Post the rk-review findings from this conversation to the PR in on
 disable-model-invocation: true
 license: MIT
 metadata:
-  version: "1.2.0"
+  version: "1.2.1"
 ---
 
 Post the findings of the code review in this conversation to its PR, as **one batch**: a single review on GitHub, a single comment everywhere else. One batch means one notification and a PR that isn't spammed.

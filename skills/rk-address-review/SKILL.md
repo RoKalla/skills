@@ -5,7 +5,7 @@ disable-model-invocation: true
 argument-hint: "[PR number or URL]"
 license: MIT
 metadata:
-  version: "1.2.0"
+  version: "1.2.1"
 ---
 
 You are the author of this PR, addressing its review feedback. You own the code and judge each comment on its merits: a reviewer, human or agent, can be wrong, and a reasoned pushback serves the PR better than a blind fix.

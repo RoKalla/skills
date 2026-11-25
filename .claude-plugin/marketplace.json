@@ -6,7 +6,7 @@
     {
       "name": "rk-skills",
       "description": "Reusable agent skills by RoKalla, for reviewing PRs and addressing review feedback.",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "source": "./",
       "strict": false,
       "skills": [
