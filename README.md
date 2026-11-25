@@ -10,7 +10,7 @@ Reusable [Agent Skills](https://code.claude.com/docs/en/skills) for reviewing PR
 | [`rk-review`](skills/rk-review/SKILL.md) | Senior-engineer review of the current branch against its target branch. It auto-detects the target from the PR or branch history and reads the PR discussion so it doesn't repeat settled points. Findings stay in the conversation. |
 | [`rk-post-findings`](skills/rk-post-findings/SKILL.md) | Posts the findings from `rk-review` to the PR in one batch: one review with a resolvable thread per finding on GitHub, one comment elsewhere. Draft first. |
 | [`rk-full-review`](skills/rk-full-review/SKILL.md) | `rk-review` followed by `rk-post-findings` in one run. Generated from those two, so it never drifts. |
-| [`rk-address-review`](skills/rk-address-review/SKILL.md) | For the PR author: triages open review feedback (from `rk-review`, humans or other bots), applies the valid fixes as local commits and drafts replies. It never posts or pushes. |
+| [`rk-address-review`](skills/rk-address-review/SKILL.md) | For the PR author: triages open review feedback (from `rk-review`, humans or other bots), and, after you approve its plan, pushes the fixes, updates the PR description, replies to every thread and resolves the settled ones. |
 
 ## Install
 
@@ -87,12 +87,15 @@ Run on your PR branch after it has received review feedback:
 It:
 
 - collects every open review thread (or uses a review you paste, if nothing is posted on the PR)
+- checks that you're on the PR's branch, with a clean tree that's up to date with the PR, before changing anything
 - checks each comment against the code, gives it its own severity next to the reviewer's, and sorts it into fix / already done / push back / ask / answer
 - shows you that plan as a table, with a one-line reason per thread, and asks "Continue with these changes?" before touching anything
-- applies the approved fixes as local commits (one per thread) and runs the repo's checks
-- drafts replies citing commit SHAs: one per thread, or one combined reply for findings that came in a single comment
+- applies the approved fixes as commits (one per thread) and runs the repo's checks
+- pushes, and updates the PR description where the fixes made it out of date
+- posts replies citing commit SHAs: one per thread, or one combined reply for findings that came in a single comment
+- resolves the fixed, already-done and answered threads, and leaves pushback and questions open for the reviewer
 
-It's draft only: it never posts comments, resolves threads or pushes.
+The plan is the only approval: everything after it runs without asking again. It stops before pushing if its changes break the checks or the push is rejected, and it never force-pushes. With a pasted review and no PR, it stops after the commits and shows the replies.
 
 All skills set `disable-model-invocation: true`, so they only run when you call them explicitly.
 

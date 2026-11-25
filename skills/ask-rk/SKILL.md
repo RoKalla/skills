@@ -18,12 +18,12 @@ Recommend the rk skill, or sequence of skills, that fits the user's situation (`
 
 ## Addressing feedback on your own PR
 
-* `/rk-address-review [PR]`: triages every open review comment (from `rk-review`, people, or bots), applies the valid fixes as local commits after the user approves the plan, and drafts replies. It never posts or pushes.
+* `/rk-address-review [PR]`: triages every open review comment (from `rk-review`, people, or bots), and, once the user approves the plan, commits and pushes the fixes, updates the PR description, replies to every thread and resolves the settled ones.
 
 ## The loop
 
 1. Reviewer: `/rk-review`, then `/rk-post-findings` (or `/rk-full-review`).
-2. Author: `/rk-address-review`, then pushes and posts the drafted replies.
+2. Author: `/rk-address-review`; after the plan is approved it pushes, replies and resolves on its own.
 3. Reviewer: `/rk-full-review` again. Findings that are still open aren't posted twice; fixed ones are noted in the summary.
 
 All rk skills find the PR's platform from the git remote and use its CLI (`gh`, `glab`, `az`), so no setup step is needed.
