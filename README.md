@@ -87,6 +87,7 @@ Run on your PR branch after it has received review feedback:
 It:
 
 - collects every open review thread (or uses a review you paste, if nothing is posted on the PR)
+- checks that you're on the PR's branch, with a clean tree that's up to date with the PR, before changing anything
 - checks each comment against the code, gives it its own severity next to the reviewer's, and sorts it into fix / already done / push back / ask / answer
 - shows you that plan as a table, with a one-line reason per thread, and asks "Continue with these changes?" before touching anything
 - applies the approved fixes as local commits (one per thread) and runs the repo's checks

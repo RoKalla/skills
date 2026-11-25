@@ -44,19 +44,31 @@ Findings posted by `rk-review` contain the marker `<!-- rk-review -->` and come 
 * **GitHub**: one review whose line comments are each a normal thread, plus a review body that may hold more numbered findings.
 * **Other platforms**: one comment listing numbered findings (`#1`, `#2`, …).
 
-Treat each numbered finding inside a single comment or review body as its own thread, keyed by its number.
+Treat each numbered finding inside a single comment or review body as its own thread, keyed by its number. Such a finding counts as answered once a later reply from the author refers to its number (e.g. `#2 Fixed in abc1234.`). A reply that doesn't mention a finding's number leaves that finding open. If the reviewer replies again about a number after the author's answer, it is open again.
 
 If there is no PR, or it has no open feedback, ask the user to paste the review (e.g. `rk-review` output) and use that as the thread list.
 
 Done when: you have a numbered list of open threads, each with author, location (file:line or general), and the request in one line.
 
-## 2. Understand before judging
+## 2. Check the working copy
+
+Fixes are committed on top of `HEAD`, so `HEAD` must be the PR's code. Check before reading any code:
+
+* **Branch**: the current branch must be the PR's head branch. If it isn't, ask the user before switching (`gh pr checkout <n>`, `glab mr checkout <n>`, or `git fetch <remote> <branch>` and `git switch <branch>` elsewhere).
+* **Clean tree**: `git status --porcelain` must be empty, or unrelated changes end up in the fix commits. If it isn't, ask the user to commit or stash them. Don't stash or discard anything yourself.
+* **In sync with the PR**: fetch the PR's head and compare it with `HEAD` (`git rev-list --left-right --count HEAD...<remote>/<branch>`). If `HEAD` is behind or has diverged, the comments refer to code you don't have: ask the user to pull or rebase first. If `HEAD` is ahead (unpushed commits), continue, but say so: the comments' line numbers refer to the pushed code, so find each location by its content, not just its line number.
+
+With a pasted review and no PR, only the clean-tree check applies. Ask the user which branch the review is for if it isn't obviously the current one.
+
+Done when: `HEAD` is the PR's head branch, the tree is clean, and `HEAD` contains everything on the PR's remote branch.
+
+## 3. Understand before judging
 
 Read the PR's intent (description, commits, linked issue) and its diff. `<target>` is the PR's base branch; when there is no PR, ask the user. `<remote>` is the remote that hosts the PR; in a fork that's usually `upstream`, not `origin`. Run `git fetch <remote> <target>`, then `git diff <remote>/<target>...HEAD`. For each thread, read the code it points at and enough surrounding code (callers, tests, similar implementations) to know whether the reviewer's claim holds at runtime.
 
 Done when: every thread has a verdict you could defend with evidence from the code.
 
-## 3. Triage and present the plan
+## 4. Triage and present the plan
 
 Classify each thread:
 
@@ -68,7 +80,7 @@ Classify each thread:
 
 Weigh the reviewer's stated severity and confidence, but verify independently: a High finding can be wrong, a Low one can hide a real bug. Give each thread your own severity on the same scale (Critical / High / Medium / Low), `?` when you can't tell until the question is settled (**Ask**), or `—` when there is no real problem (**Push back**, **Already done**, or an **Answer** that shows none).
 
-Show the plan as a table, ordered by your severity: Critical first, then `?`, then `—`:
+Show the plan as a table, ordered by your severity: Critical, High, Medium, Low, then `?`, then `—`:
 
 | # | Location | Reviewer | Yours | Verdict | Why | Action |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -83,7 +95,7 @@ End with an explicit question: **"Continue with these changes?"** Then **stop fo
 
 Done when: the user has approved the plan.
 
-## 4. Apply the fixes
+## 5. Apply the fixes
 
 For each **Fix** thread, make the change in the style of the surrounding code, reusing existing helpers and patterns. Keep each change scoped to its thread; note anything else you spot for the summary instead of fixing it.
 
@@ -93,7 +105,7 @@ Run the repo's tests, linter, and type checker for the affected areas (find the 
 
 Done when: every Fix thread has a commit, and the checks pass, or the remaining failures are shown to predate your changes.
 
-## 5. Draft the replies
+## 6. Draft the replies
 
 Write one reply per thread, ready to paste. Where several findings share one comment or review body, write one combined reply to it that answers each finding by number (`#1 Fixed in abc1234.`, `#2 …`), so the PR gets one reply instead of many.
 
